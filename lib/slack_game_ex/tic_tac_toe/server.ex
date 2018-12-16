@@ -36,25 +36,19 @@ defmodule SlackGameEx.TicTacToe.Server do
       end
 
     case move do
-      {:win, player, game} ->
-        {:reply, {:win, player}, %{state | game: game}}
-
-      {:tie, game} ->
-        {:reply, {:tie, game}, %{state | game: game}}
-
-      {:playing, game} ->
-        {:reply, {:playing, game}, %{state | game: game}}
+      {result, game} ->
+        {:reply, {result, game}, %{state | game: game}}
 
       :error ->
         {:reply, :error, state}
     end
   end
 
-  def handle_cast(:restart, state) do
-    {:noreply, %{state | game: Game.new()}}
-  end
-
   def handle_call(:print, _from, state) do
     {:reply, Game.print(state.game), state}
+  end
+
+  def handle_cast(:restart, state) do
+    {:noreply, %{state | game: Game.new()}}
   end
 end

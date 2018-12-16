@@ -6,11 +6,16 @@ defmodule SlackGameEx.Application do
   use Application
 
   def start(_type, _args) do
-    children = [
-      {Registry, keys: :unique, name: SlackGameEx.TicTacToe.Registry},
-      SlackGameEx.TicTacToe.Supervisor,
-      {SlackGameEx.TicTacToe.Bot, auth_token()}
-    ]
+    children =
+      if Mix.env() == :test do
+        []
+      else
+        [
+          {Registry, keys: :unique, name: SlackGameEx.TicTacToe.Registry},
+          SlackGameEx.TicTacToe.Supervisor,
+          {SlackGameEx.TicTacToe.Bot, auth_token()}
+        ]
+      end
 
     opts = [strategy: :one_for_one, name: SlackGameEx.Supervisor]
     Supervisor.start_link(children, opts)

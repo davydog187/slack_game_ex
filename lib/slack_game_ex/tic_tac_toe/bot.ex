@@ -56,7 +56,7 @@ defmodule SlackGameEx.TicTacToe.Bot do
          {:ok, game} <- TicTacToe.Supervisor.find_game(key(message)) do
       reply =
         case TicTacToe.Server.move(game, position) do
-          {:win, player} ->
+          {{:win, player}, _game} ->
             "You won player #{player}! Nice!"
 
           {:tie, _game} ->
@@ -92,7 +92,7 @@ defmodule SlackGameEx.TicTacToe.Bot do
     with {:ok, game} <- TicTacToe.Supervisor.find_game(key) do
       reply =
         case TicTacToe.Server.random_move(game) do
-          {:win, _player} ->
+          {{:win, _player}, _game} ->
             "Looks like I won! Better luck next time..."
 
           {:tie, _game} ->

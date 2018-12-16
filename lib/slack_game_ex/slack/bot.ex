@@ -31,24 +31,10 @@ defmodule SlackGameEx.Slack.Bot do
                 {:ok, state}
 
               {:reply, message_text, state} ->
-                message = %{
-                  id: state.id,
-                  type: :message,
-                  channel: incoming["channel"],
-                  text: message_text
-                }
-
-                {:reply, {:text, Jason.encode!(message)}, next_state(state)}
+                send_message(incoming["channel"], message_text, state)
 
               {:reply, message_text, channel, state} ->
-                message = %{
-                  id: state.id,
-                  type: :message,
-                  channel: channel,
-                  text: message_text
-                }
-
-                {:reply, {:text, Jason.encode!(message)}, next_state(state)}
+                send_message(channel, message_text, state)
 
               other ->
                 other

@@ -17,6 +17,15 @@ defmodule SlackGameEx.TicTacToe.Game do
     end
   end
 
+  @doc """
+  iex> game = new()
+  iex> move(game, 1)
+  {:playing, %SlackGameEx.TicTacToe.Game{
+    available: MapSet.new(2..9),
+    board: %{1 => :one},
+    player: :two
+  }}
+  """
   def move(%__MODULE__{board: board} = game, position) when position >= 1 and position <= 9 do
     if Map.has_key?(board, position) do
       :error
@@ -30,8 +39,8 @@ defmodule SlackGameEx.TicTacToe.Game do
 
   defp game_state(%{board: board} = game) do
     cond do
-      won?(game) -> {:win, game.player, game}
-      Map.size(board) == 9 -> {:tie, board}
+      won?(game) -> {{:win, game.player}, game}
+      Map.size(board) == 9 -> {:tie, game}
       true -> {:playing, %{game | player: next_player(game.player)}}
     end
   end
@@ -61,7 +70,7 @@ defmodule SlackGameEx.TicTacToe.Game do
       [3, 5, 7]
     ]
 
-    Enum.any?(lines, fn [first | rest] = line ->
+    Enum.any?(lines, fn [first | rest] ->
       first = Map.get(board, first, :error)
 
       Enum.all?(rest, fn index -> Map.get(board, index) == first end)
