@@ -7,7 +7,12 @@ defmodule SlackGameEx.TicTacToe.Server do
     GenServer.start_link(__MODULE__, Game.new(), opts)
   end
 
-  def print(pid) do GenServer.call(pid, :print)
+  def print(pid) do
+    GenServer.call(pid, :print)
+  end
+
+  def random_move(pid) do
+    GenServer.call(pid, {:move, :random})
   end
 
   def move(pid, position) do
@@ -24,7 +29,13 @@ defmodule SlackGameEx.TicTacToe.Server do
   end
 
   def handle_call({:move, position}, _from, state) do
-    case Game.move(state.game, position) do
+    move =
+      case position do
+        :random -> Game.random_move(state.game)
+        number -> Game.move(state.game, number)
+      end
+
+    case move do
       {:win, player, game} ->
         {:reply, {:win, player}, %{state | game: game}}
 

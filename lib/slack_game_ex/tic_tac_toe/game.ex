@@ -1,19 +1,38 @@
 defmodule SlackGameEx.TicTacToe.Game do
-  defstruct board: %{}, player: :one
+  defstruct board: %{}, player: :one, available: nil
 
-  def new, do: %__MODULE__{}
+  def new do
+    %__MODULE__{available: MapSet.new(1..9)}
+  end
+
+  def random_move(%__MODULE__{board: board} = game) do
+    if MapSet.size(game.available) == 0 do
+      :error
+    else
+      position = Enum.random(game.available)
+      board = Map.put(board, position, game.player)
+      available = MapSet.delete(game.available, position)
+
+      game_state(%{game | board: board, available: available})
+    end
+  end
 
   def move(%__MODULE__{board: board} = game, position) when position >= 1 and position <= 9 do
     if Map.has_key?(board, position) do
       :error
     else
       board = Map.put(board, position, game.player)
+      available = MapSet.delete(game.available, position)
 
-      cond do
-        won?(board) -> {:win, game.player, %{game | board: board}}
-        Map.size(board) == 9 -> {:tie, board}
-        true -> {:playing, %{game | board: board, player: next_player(game.player)}}
-      end
+      game_state(%{game | board: board, available: available})
+    end
+  end
+
+  defp game_state(%{board: board} = game) do
+    cond do
+      won?(game) -> {:win, game.player, game}
+      Map.size(board) == 9 -> {:tie, board}
+      true -> {:playing, %{game | player: next_player(game.player)}}
     end
   end
 
@@ -30,7 +49,7 @@ defmodule SlackGameEx.TicTacToe.Game do
     |> Enum.join("\n----------\n")
   end
 
-  defp won?(board) do
+  defp won?(%__MODULE__{board: board}) do
     lines = [
       [1, 4, 7],
       [2, 5, 8],

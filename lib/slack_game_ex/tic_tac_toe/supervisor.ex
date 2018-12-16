@@ -4,7 +4,6 @@ defmodule SlackGameEx.TicTacToe.Supervisor do
   alias SlackGameEx.TicTacToe
 
   def start_link(arg) do
-    IO.inspect arg, label: "supervisor arg"
     DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 

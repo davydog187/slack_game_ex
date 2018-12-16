@@ -2,14 +2,6 @@ defmodule SlackGameEx.TicTacToe.Bot do
   use SlackGameEx.Slack.Bot
 
   alias SlackGameEx.TicTacToe
-  alias SlackGameEx.TicTacToe.Game
-
-  require Logger
-
-  def init(state) do
-    log("got init")
-    {:ok, state}
-  end
 
   def handle_event({:message, "restart", message}, state) do
     with {:ok, game} <- TicTacToe.Supervisor.find_game(key(message)) do
@@ -95,14 +87,30 @@ defmodule SlackGameEx.TicTacToe.Bot do
     {:reply, "got your message: #{text}", channel, state}
   end
 
-  def handle_info({:bot_move, key, channel} = message, state) do
-    IO.inspect message, label: "bot movin"
+  def handle_info({:bot_move, key, channel}, state) do
+    with {:ok, game} <- TicTacToe.Supervisor.find_game(key) do
+      reply =
+        case TicTacToe.Server.random_move(game) do
+          {:win, _player} ->
+            "Looks like I won! Better luck next time..."
+          {:tie, _game} ->
+            "Looks like it was a tie"
+          {:playing, game} ->
+            """
+            I moved, your turn!
 
-    send_message(channel, "bot movin!", state)
-  end
+            ```
+            #{TicTacToe.Game.print(game)}
+            ```
+            """
+          :error ->
+            "I tried to move, but something went wrong :("
+        end
 
-  defp log(message) do
-    Logger.info("#{inspect(__MODULE__)} #{message}")
+      send_message(channel, reply, state)
+    else
+      _ -> {:ok, state}
+    end
   end
 
   defp key(%{"user" => user}) do

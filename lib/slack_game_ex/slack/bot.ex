@@ -8,12 +8,14 @@ defmodule SlackGameEx.Slack.Bot do
       use WebSockex
       import unquote(__MODULE__)
 
+      require Logger
+
       def start_link(token) do
         {:ok, %{"url" => url} = response} = Auth.authorize(token)
 
-        IO.puts("Connecting to websocket #{url}")
+        Logger.info("#{inspect __MODULE__} connecting to websocket #{url}")
 
-        WebSockex.start_link(url, __MODULE__, %{id: 1}, debug: [:trace])
+        WebSockex.start_link(url, __MODULE__, %{id: 1})
       end
 
       def handle_frame({:text, incoming}, state) do
@@ -61,7 +63,9 @@ defmodule SlackGameEx.Slack.Bot do
 
       def handle_frame(_message, state), do: {:ok, state}
 
-      defoverridable handle_frame: 2, init: 1
+      def handle_event(_message, state), do: {:ok, state}
+
+      defoverridable handle_event: 2, init: 1
     end
   end
 
