@@ -35,7 +35,6 @@ defmodule SlackGameEx.TicTacToe.Bot do
     else
       _ -> {:reply, "Could not print the game. Would you like to start one?", state}
     end
-
   end
 
   def handle_event({:message, "new game", message}, state) do
@@ -55,13 +54,14 @@ defmodule SlackGameEx.TicTacToe.Bot do
   def handle_event({:message, "move " <> position, message}, state) do
     with {position, _} <- Integer.parse(position),
          {:ok, game} <- TicTacToe.Supervisor.find_game(key(message)) do
-
       reply =
         case TicTacToe.Server.move(game, position) do
           {:win, player} ->
             "You won player #{player}! Nice!"
+
           {:tie, _game} ->
             "Looks like it was a tie"
+
           {:playing, game} ->
             Process.send_after(self(), {:bot_move, key(message), message["channel"]}, 1000)
 
@@ -72,6 +72,7 @@ defmodule SlackGameEx.TicTacToe.Bot do
             #{TicTacToe.Game.print(game)}
             ```
             """
+
           :error ->
             "Something went wrong"
         end
@@ -93,8 +94,10 @@ defmodule SlackGameEx.TicTacToe.Bot do
         case TicTacToe.Server.random_move(game) do
           {:win, _player} ->
             "Looks like I won! Better luck next time..."
+
           {:tie, _game} ->
             "Looks like it was a tie"
+
           {:playing, game} ->
             """
             I moved, your turn!
@@ -103,6 +106,7 @@ defmodule SlackGameEx.TicTacToe.Bot do
             #{TicTacToe.Game.print(game)}
             ```
             """
+
           :error ->
             "I tried to move, but something went wrong :("
         end

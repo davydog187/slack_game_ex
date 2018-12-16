@@ -15,5 +15,4 @@ defmodule SlackGameEx.Slack.Auth do
       other -> other
     end
   end
-
 end

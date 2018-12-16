@@ -29,5 +29,4 @@ use Mix.Config
 #
 #     import_config "#{Mix.env()}.exs"
 
-
 config :slack_game_ex, auth_token: System.get_env("AUTH_TOKEN")

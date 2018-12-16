@@ -27,7 +27,9 @@ defmodule SlackGameEx.TicTacToe.Supervisor do
 
   def find_or_start_game(key) do
     case lookup(key) do
-      {:ok, game} -> {:ok, game}
+      {:ok, game} ->
+        {:ok, game}
+
       :error ->
         start_game(key)
     end
@@ -39,5 +41,4 @@ defmodule SlackGameEx.TicTacToe.Supervisor do
       _ -> :error
     end
   end
-
 end

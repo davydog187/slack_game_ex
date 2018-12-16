@@ -13,7 +13,7 @@ defmodule SlackGameEx.Slack.Bot do
       def start_link(token) do
         {:ok, %{"url" => url} = response} = Auth.authorize(token)
 
-        Logger.info("#{inspect __MODULE__} connecting to websocket #{url}")
+        Logger.info("#{inspect(__MODULE__)} connecting to websocket #{url}")
 
         WebSockex.start_link(url, __MODULE__, %{id: 1})
       end
@@ -76,7 +76,6 @@ defmodule SlackGameEx.Slack.Bot do
       channel: channel,
       text: message_text
     }
-
 
     {:reply, {:text, Jason.encode!(message)}, next_state(state)}
   end
